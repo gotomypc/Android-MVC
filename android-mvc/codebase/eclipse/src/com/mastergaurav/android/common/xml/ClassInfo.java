@@ -1,10 +1,3 @@
-/**
- * ClassInfo.java $version 2010.02.20
- * 
- * Copyright 2010 NHN Corp. All rights Reserved.
- * NHN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-
 package com.mastergaurav.android.common.xml;
 
 /**
@@ -13,7 +6,6 @@ package com.mastergaurav.android.common.xml;
  * between an element (via its name) and the type that it maps to. <br/>
  * See {@link XMLDeserializer} for more details on its usage
  * 
- * @author Accenture India
  * @see XMLDeserializer
  */
 public class ClassInfo

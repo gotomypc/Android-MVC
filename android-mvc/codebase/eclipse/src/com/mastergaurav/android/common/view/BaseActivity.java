@@ -15,40 +15,6 @@ import com.mastergaurav.android.mvc.common.IResponseListener;
 import com.mastergaurav.android.mvc.common.Response;
 import com.mastergaurav.android.mvc.controller.Controller;
 
-/**
- * <pre>
- * TODO: Write the logic for {@link IMemento} part -- it will be used by {@link Controller} to save/load states.
- * One possible track is... pass on the value of {@link #saveMemento()} in onPause to Controller and use that in
- *  the method {@link #onCreate(Bundle)} by using {@link #loadMemento(Object)},
- *  say when the method {@link #notifiyControllerActivityCreated()} is called.
- * 
- * Caution: The method {@link #loadMemento(Object)} must be called before {@link #onAfterCreate(Bundle)}.
- * 
- * Note: The data can flow into an activity from three different sources:
- * 1. Previous activity
- * 2. Data Layer
- * 3. Saved Memento (if being reloaded/recreated)
- * 
- * Proceess:
- * 1. Activity construction
- * 2. {@link #notifiyControllerActivityCreating()}
- *   2a. {@link #initialize(Object)} (using some ScreenData or whatever on the stack - but from previous activity?)
- *   ^^^^^^^^^^ (1) of data source
- * 3. {@link #onBeforeCreate(Bundle)}
- * 4. {@link Activity#onCreate(Bundle)}
- * 5. {@link #onCreateContent(Bundle)}
- * 6. {@link #notifiyControllerActivityCreated()}
- *   6a. {@link #processInitialData(Response)} (based on the response from Data Manager)
- *   ^^^^^^^^^^ (2) of data source
- *   6b. {@link #loadMemento(Object)} (based on the previously saved state)
- *   ^^^^^^^^^^ (3) of data source
- * 
- * 7. {@link #onPause()}
- *   7a. {@link #saveMemento()} or notify Controller about "onPause" -- "handlePause(this)" or something like that
- * </pre>
- * 
- * @author Accenture India
- */
 public abstract class BaseActivity extends Activity implements IResponseListener, IInitializable, IMemento
 {
 	private View mainView;

@@ -1,10 +1,3 @@
-/**
- * ErrorActivity.java $version 1.0 Mar 11, 2010
- * 
- * Copyright 2010 NHN Corp. All rights Reserved.
- * NHN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-
 package com.mastergaurav.android.common.view;
 
 import android.os.Bundle;

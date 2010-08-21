@@ -1,31 +1,9 @@
-/**
- * FieldInfo.java $version 1.0 2010.02.20
- * 
- * Copyright 2010 NHN Corp. All rights Reserved.
- * NHN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-
 package com.mastergaurav.android.common.xml;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
- * Holds key information about a field. <br/>
- * The information held by this type includes:
- * <ol>
- * <li>Name of the XML element</li>
- * <li>Name of the field</li>
- * <li>Class information of the field</li>
- * <li>Type of the field. See {@link FieldType}</li>
- * <li>Reference to the field. See {@link Field}</li>
- * <li>References to the methods to get or set the value, or add in case of a
- * collection. See {@link Method}</li>
- * </ol>
- * <br/>
- * See {@link XMLDeserializer} for usage
- * 
- * @author Accenture India
  * @see XMLDeserializer
  */
 public class FieldInfo

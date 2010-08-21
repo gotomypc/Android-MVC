@@ -1,10 +1,3 @@
-/**
- * Converter.java $version 2010.02.20
- * 
- * Copyright 2010 NHN Corp. All rights Reserved.
- * NHN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-
 package com.mastergaurav.android.common.xml;
 
 import java.util.Date;
@@ -25,8 +18,6 @@ import java.util.Map;
  * <li>{@link Boolean}</li>
  * <li>{@link Date}</li>
  * </ol>
- * 
- * @author Accenture India
  */
 public final class Converter
 {

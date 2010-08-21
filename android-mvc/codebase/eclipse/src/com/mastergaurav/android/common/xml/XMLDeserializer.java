@@ -1,10 +1,3 @@
-/**
- * XMLDeserializer.java $version 1.0 2010.02.20
- * 
- * Copyright 2010 NHN Corp. All rights Reserved.
- * NHN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-
 package com.mastergaurav.android.common.xml;
 
 import java.io.IOException;
@@ -12,7 +5,6 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,135 +16,6 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.util.Xml;
 
-/**
- * Helper utilitity to deserialize any XML content into a specified model. <br/>
- * Key characterstics:
- * <ol>
- * <li>Uses reflection</li>
- * <li>Follows singleton pattern</li>
- * <li>Automatically maps elements with fields with same names</li>
- * <li>Provides flexibility to customize the element name against field name.
- * Useful in cases where element name may not be a valid Java identified</li>
- * <li>Invokes the setters for non-collection fields, allowing for validation
- * and other business logic to be performed</li>
- * <li>Invokes the add-method for collection fields</li>
- * </ol>
- * 
- * <p>
- * Steps to design the model:
- * <ol>
- * <li>Start by choosing a name for the model. This will represent the final
- * class.</li>
- * <li>Add fields with names matching that of the elements in the XML to be
- * parsed. For example, if the name of the element is <code>message</code>, add
- * a field with the name <code>message</code>.</li>
- * <li>If the name of the element is such that it does not qualify to be a valid
- * Java identifier, for example, <code>rss2.0</code>, use {@link ElementName}
- * annotation. Give any name to the field and specify the name of the element
- * using the annotation.</li>
- * <li>The type of the fields that are possible are one of the following:
- * <ul>
- * <li>Pseudo-primitive types, as identified by {@link Converter} utilitly</li>
- * <li>Any custom type with a public parameterless constructor</li>
- * <li>Any class that inherits from {@link List}, for example {@link ArrayList}.
- * Such field will be referred to as a collection field</li>
- * </ul>
- * </li>
- * <li>For a collection field, you must specify the type of items in the
- * collection using the annotation {@link ItemType}.</li>
- * <li>Create getters and setters for non-collection field.</li>
- * <li>
- * For a collection field, you must have the add-method with the name
- * <code>addXXX</code> where <code>XXX</code> is the capitalized name of the
- * field. It must take exactly one parameter, of the type of the item in the
- * collection.</li>
- * <li>
- * Use the method {@link #deserialize(InputStream, Class)} to deserialize the
- * XML from the stream to appropriate entity type.</li>
- * </ol>
- * </p>
- * 
- * <p>
- * Notes:
- * <ul>
- * <li>If no matching field is found for a specific element, the field will be
- * ignored.</li>
- * <li>If there is an extra field in the model corresponding to which no element
- * exists, it will continue to have its default value</li>
- * <li>Similarly, if there is an error while converting the value, the field
- * will retain its default value</li>
- * </ul>
- * </p>
- * 
- * <p>
- * An example is demonstrated below:
- * </p>
- * 
- * <p>
- * XML:
- * </p>
- * 
- * <pre>
- * &lt;blog&gt;
- *   &lt;message&gt;A-Value&lt;/message&gt;
- *   &lt;code2.0&gt;1234&lt;/code2.0&gt;
- *   &lt;item&gt;
- *     &lt;c&gt;C1-Value&lt;/c&gt;
- *   &lt;/item&gt;
- *   &lt;item&gt;
- *     &lt;c&gt;C2-Value&lt;/c&gt;
- *   &lt;/item&gt;
- * </pre>
- * 
- * <p>
- * Model:
- * </p>
- * 
- * <pre>
- * public class ModelA
- * {
- *    private String message;
- *    {@link ElementName ElementName("code2.0")}
- *    private int code;
- *    
- *    {@link ItemType ItemType(ModelB.class)}
- *    private List&lt;ModelB&gt; item = new List&lt;ModelB&gt;();
- *    
- *    public void setMessage(String message) { ... }
- *    public void setCode(int code) { ... }
- *    
- *    public void addItem(ModelB value) { ... }
- *    
- *    //Omitting the getters for brevity.
- * }
- * 
- * public class ModelB
- * {
- *    private String c;
- *    
- *    public void setC(String value) { ... }
- *    
- *    //Omitting the getters for brevity.
- * }
- * </pre>
- * 
- * <p>
- * To deserialize:
- * </p>
- * 
- * <pre>
- * InputStream input = getStreamFromSomewhere();
- * ModelA aValue = XMLDeserializer.getInstance().deserialize(input, ModelA.class);
- * //Work with aValue...
- * </pre>
- * 
- * @author Accenture India
- * @see ClassInfo
- * @see ElementName
- * @see FieldInfo
- * @see FieldType
- * @see ItemType
- */
 public final class XMLDeserializer
 {
 	/**
@@ -188,18 +51,6 @@ public final class XMLDeserializer
 	{
 	}
 
-	/**
-	 * Deserializes the XML data from the input to the corresponding entity type <br/>
-	 * If there is an error while parsing, if possible it will try to ignore it,
-	 * otherwise returns a null value.
-	 * 
-	 * @param input
-	 *            Input stream to read data from
-	 * @param objType
-	 *            Type of the entity to deserialize data to
-	 * @return Deserialized object, if successful, null otherwise
-	 * @see #deserialize(XmlPullParser, Class)
-	 */
 	public <T> T deserialize(InputStream input, Class<T> objType)
 	{
 		XmlPullParser parser = Xml.newPullParser();
@@ -215,18 +66,6 @@ public final class XMLDeserializer
 		return null;
 	}
 
-	/**
-	 * Deserializes the XML data from the input to the corresponding entity type <br/>
-	 * If there is an error while parsing, if possible it will try to ignore it,
-	 * otherwise returns a null value.
-	 * 
-	 * @param parser
-	 *            Parser to read XML from
-	 * @param objType
-	 *            Type of the entity to deserialize data to
-	 * @return Deserialized object, if successful, null otherwise
-	 * @see #deserialize(InputStream, Class)
-	 */
 	public <T> T deserialize(XmlPullParser parser, Class<T> objType)
 	{
 		T rv = null;
@@ -260,20 +99,6 @@ public final class XMLDeserializer
 		return rv;
 	}
 
-	/**
-	 * Deserialize a specific element, recursively.
-	 * 
-	 * @param obj
-	 *            Object whose fields need to be set
-	 * @param parser
-	 *            XML Parser to read data from
-	 * @param stack
-	 *            Stack of {@link ClassInfo} - entity type under consideration
-	 * @throws XmlPullParserException
-	 *             If an exception occurs during parsing
-	 * @throws IOException
-	 *             If an exception occurs while reading
-	 */
 	private void deserialize(Object obj, XmlPullParser parser, Stack<ClassInfo> stack) throws XmlPullParserException,
 			IOException
 	{
@@ -380,18 +205,6 @@ public final class XMLDeserializer
 		stack.pop();
 	}
 
-	/**
-	 * Skips the current element.
-	 * 
-	 * @param parser
-	 *            Parser for reading data
-	 * @param elementName
-	 *            Element to be skipped
-	 * @throws XmlPullParserException
-	 *             If an exception occurs during parsing
-	 * @throws IOException
-	 *             If an exception occurs while reading
-	 */
 	private void skipElement(XmlPullParser parser, String elementName) throws XmlPullParserException, IOException
 	{
 		int indent = 0;
@@ -413,22 +226,6 @@ public final class XMLDeserializer
 		}
 	}
 
-	/**
-	 * Adds a value to specified collection field
-	 * 
-	 * @param obj
-	 *            Object whose field is to be deserialized
-	 * @param info
-	 *            The field details
-	 * @param value
-	 *            Value to add to collection
-	 * @throws IllegalArgumentException
-	 *             {@see Method#invoke(Object, Object...)}
-	 * @throws IllegalAccessException
-	 *             {@see Method#invoke(Object, Object...)}
-	 * @throws InvocationTargetException
-	 *             {@see Method#invoke(Object, Object...)}
-	 */
 	private void addFieldValue(Object obj, FieldInfo info, Object value) throws IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException
 	{
@@ -436,22 +233,6 @@ public final class XMLDeserializer
 		addMethod.invoke(obj, value);
 	}
 
-	/**
-	 * Set the value to a specified non-collection field
-	 * 
-	 * @param obj
-	 *            Object whose field is to be deserialized
-	 * @param info
-	 *            The field details
-	 * @param value
-	 *            Value to add to collection
-	 * @throws IllegalArgumentException
-	 *             {@see Method#invoke(Object, Object...)}
-	 * @throws IllegalAccessException
-	 *             {@see Method#invoke(Object, Object...)}
-	 * @throws InvocationTargetException
-	 *             {@see Method#invoke(Object, Object...)}
-	 */
 	private void setFieldValue(Object obj, FieldInfo info, Object value) throws IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException
 	{
@@ -462,15 +243,6 @@ public final class XMLDeserializer
 		}
 	}
 
-	/**
-	 * Retrieves the field information for the specified type and element name
-	 * 
-	 * @param clz
-	 *            Entity type under consideration
-	 * @param elementName
-	 *            Name of the element being deserialized
-	 * @return Field information with all details
-	 */
 	private FieldInfo getFieldInfo(Class<?> clz, String elementName)
 	{
 		FieldInfo info = new FieldInfo();
@@ -528,21 +300,6 @@ public final class XMLDeserializer
 		return info;
 	}
 
-	/**
-	 * Gets the field name for the corresponding element in the specified entity
-	 * type.
-	 * <p>
-	 * If the field with exact name does not exist, it makes use of {@see
-	 * ElementName} annotation on any of the fields declared in the class to
-	 * identify the correct field in the entity
-	 * </p>
-	 * 
-	 * @param clz
-	 *            Entity type under consideration
-	 * @param elementName
-	 *            Name of the element being deserialized
-	 * @return Name of the field, if found, null otherwise
-	 */
 	private String getFieldName(Class<?> clz, String elementName)
 	{
 		if(validFieldNamePattern.matcher(elementName).matches())
@@ -563,13 +320,6 @@ public final class XMLDeserializer
 		return fieldName;
 	}
 
-	/**
-	 * Returns the name of the getter method for a field.
-	 * 
-	 * @param fieldName
-	 *            Field name under consideration
-	 * @return Name of the getter method for the field
-	 */
 	public String getGetMethodName(String fieldName)
 	{
 		if(getMethodNameMap.containsKey(fieldName))
@@ -581,13 +331,6 @@ public final class XMLDeserializer
 		return method;
 	}
 
-	/**
-	 * Returns the name of the setter method for a field.
-	 * 
-	 * @param fieldName
-	 *            Field name under consideration
-	 * @return Name of the setter method for the field
-	 */
 	public String getSetMethodName(String fieldName)
 	{
 		if(setMethodNameMap.containsKey(fieldName))
@@ -599,13 +342,6 @@ public final class XMLDeserializer
 		return method;
 	}
 
-	/**
-	 * Returns the name of the add-method for a field.
-	 * 
-	 * @param fieldName
-	 *            Field name under consideration
-	 * @return Name of the add-method for the field
-	 */
 	public String getAddMethodName(String fieldName)
 	{
 		if(addMethodNameMap.containsKey(fieldName))
@@ -617,11 +353,6 @@ public final class XMLDeserializer
 		return method;
 	}
 
-	/**
-	 * Returns the one and only instance of {@see XMLDeserializer}
-	 * 
-	 * @return The XMLDeserializer instance
-	 */
 	public static XMLDeserializer getInstance()
 	{
 		return instance;
