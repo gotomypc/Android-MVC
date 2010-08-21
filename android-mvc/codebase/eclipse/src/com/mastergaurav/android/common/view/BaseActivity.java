@@ -1,6 +1,8 @@
 package com.mastergaurav.android.common.view;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,6 +14,7 @@ import android.view.Window;
 import com.mastergaurav.android.mvc.common.IInitializable;
 import com.mastergaurav.android.mvc.common.IMemento;
 import com.mastergaurav.android.mvc.common.IResponseListener;
+import com.mastergaurav.android.mvc.common.Request;
 import com.mastergaurav.android.mvc.common.Response;
 import com.mastergaurav.android.mvc.controller.Controller;
 
@@ -20,6 +23,8 @@ public abstract class BaseActivity extends Activity implements IResponseListener
 	private View mainView;
 	private ViewGroup contentView;
 	private MenuItem selectedItem = null;
+
+	private static final int DIALOG_ID_PROGRESS_DEFAULT = 0x174980;
 
 	@Override
 	protected final void onCreate(Bundle savedInstanceState)
@@ -101,9 +106,6 @@ public abstract class BaseActivity extends Activity implements IResponseListener
 		return createDefaultOptionsMenu(menu);
 	}
 
-	/**
-	 * Why are you overriding this method and what are you achieving here?
-	 */
 	@Override
 	public final boolean onOptionsItemSelected(MenuItem item)
 	{
@@ -134,20 +136,6 @@ public abstract class BaseActivity extends Activity implements IResponseListener
 		}
 	}
 
-	/**
-	 * Handles option menu item selection. <br/>
-	 * The method launches of the following screens:
-	 * <ol>
-	 * <li>Home</li>
-	 * <li>My Blog</li>
-	 * <li>Favourite Blogs</li>
-	 * <li>Write Post</li>
-	 * <li>Settigns</li>
-	 * </ol>
-	 * 
-	 * @param itemId
-	 * @return
-	 */
 	protected boolean onOptionsItemSelected(int itemId)
 	{
 		return true;
@@ -155,21 +143,13 @@ public abstract class BaseActivity extends Activity implements IResponseListener
 
 	private int[][] optionMenuIds = {
 	/*
-	 * { R.string.main_menu_title_01, R.drawable.menu_icon_1_off,
-	 * R.drawable.menu_icon_1_on },
-	 * { R.string.main_menu_title_02, R.drawable.menu_icon_2_off,
-	 * R.drawable.menu_icon_2_on },
-	 * { R.string.main_menu_title_03, R.drawable.menu_icon_3_off,
-	 * R.drawable.menu_icon_3_on },
-	 * { R.string.main_menu_title_04, R.drawable.menu_icon_4_off,
-	 * R.drawable.menu_icon_4_on },
-	 * { R.string.main_menu_title_05, R.drawable.menu_icon_5_off,
-	 * R.drawable.menu_icon_5_on }
-	 */};
+	 * { R.string.title_of_item_01, R.drawable.icon_deselected_item_01,
+	 * R.drawable.icon_selected_item_01 }
+	 */
+	};
 
 	private boolean createDefaultOptionsMenu(Menu menu)
 	{
-
 		MenuItem item;
 
 		for(int i = 0; i < optionMenuIds.length; i++)
@@ -217,4 +197,63 @@ public abstract class BaseActivity extends Activity implements IResponseListener
 	public void loadMemento(Object savedMemento)
 	{
 	}
+
+	protected void showProgress()
+	{
+		showDialog(DIALOG_ID_PROGRESS_DEFAULT);
+	}
+
+	protected void hideProgress()
+	{
+		try
+		{
+			removeDialog(DIALOG_ID_PROGRESS_DEFAULT);
+		} catch(IllegalArgumentException iae)
+		{
+		}
+	}
+	
+	@Override
+	protected Dialog onCreateDialog(int id)
+	{
+		switch(id)
+		{
+			case DIALOG_ID_PROGRESS_DEFAULT:
+				ProgressDialog dlg = new ProgressDialog(this);
+				//dlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+				dlg.setMessage("Working...");
+				dlg.setCancelable(true);
+				return dlg;
+			default:
+				return super.onCreateDialog(id);
+
+		}
+	}
+
+	protected final void go(int commandID, Request request)
+	{
+		go(commandID, request, true);
+	}
+
+	protected final void go(int commandID, Request request, boolean showProgress)
+	{
+		if(showProgress)
+		{
+			showProgress();
+		}
+		getController().go(commandID, request, this, showProgress);
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
