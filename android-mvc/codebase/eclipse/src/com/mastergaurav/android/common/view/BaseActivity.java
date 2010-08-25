@@ -241,7 +241,20 @@ public abstract class BaseActivity extends Activity implements IResponseListener
 		{
 			showProgress();
 		}
-		getController().go(commandID, request, this, showProgress);
+		getController().go(commandID, request, this);
+	}
+	
+	protected final void go(int commandID, Request request, boolean showProgress, boolean record)
+	{
+		if(showProgress)
+		{
+			showProgress();
+		}
+	}
+	
+	protected final void back()
+	{
+		getController().back();
 	}
 }
 
