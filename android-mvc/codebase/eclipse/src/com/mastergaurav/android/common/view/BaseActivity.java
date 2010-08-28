@@ -8,20 +8,18 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 
-import com.mastergaurav.android.mvc.common.IInitializable;
-import com.mastergaurav.android.mvc.common.IMemento;
+import com.mastergaurav.android.common.log.Logger;
 import com.mastergaurav.android.mvc.common.IResponseListener;
 import com.mastergaurav.android.mvc.common.Request;
 import com.mastergaurav.android.mvc.common.Response;
 import com.mastergaurav.android.mvc.controller.Controller;
 
-public abstract class BaseActivity extends Activity implements IResponseListener, IInitializable, IMemento
+public abstract class BaseActivity extends Activity implements IResponseListener
 {
+	private static final String TAG = "BaseActivity";
 	private View mainView;
-	private ViewGroup contentView;
 	private MenuItem selectedItem = null;
 
 	private static final int DIALOG_ID_PROGRESS_DEFAULT = 0x174980;
@@ -40,13 +38,6 @@ public abstract class BaseActivity extends Activity implements IResponseListener
 		notifiyControllerActivityCreated();
 
 		onAfterCreate(savedInstanceState);
-	}
-
-	@Override
-	protected void onPause()
-	{
-		getController().onActivityPaused();
-		super.onPause();
 	}
 
 	public Controller getController()
@@ -75,13 +66,24 @@ public abstract class BaseActivity extends Activity implements IResponseListener
 	protected void onCreateContent(Bundle savedInstanceState)
 	{
 		LayoutInflater inflator = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-		mainView = inflator.inflate(getLayoutResource(), null, false);
 
+		int rid = getContentViewID();
+		if(rid != -1)
+		{
+			mainView = inflator.inflate(getContentViewID(), null, false);
+		} else
+		{
+			mainView = createContentView();
+		}
 		setContentView(mainView);
-		// contentView = (ViewGroup) mainView.findViewById(R.id.ContentView);
 	}
 
-	protected int getLayoutResource()
+	protected View createContentView()
+	{
+		return null;
+	}
+
+	protected int getContentViewID()
 	{
 		return -1;
 	}
@@ -89,11 +91,6 @@ public abstract class BaseActivity extends Activity implements IResponseListener
 	protected final View getMainView()
 	{
 		return mainView;
-	}
-
-	protected final ViewGroup getContentView()
-	{
-		return contentView;
 	}
 
 	@Override
@@ -168,10 +165,8 @@ public abstract class BaseActivity extends Activity implements IResponseListener
 
 	protected boolean createCustomOptionsMenu(Menu menu)
 	{
-		return true;
+		return false;
 	}
-
-	protected abstract int getID();
 
 	public void onError(Response response)
 	{
@@ -181,21 +176,24 @@ public abstract class BaseActivity extends Activity implements IResponseListener
 	{
 	}
 
-	public void initialize(Object data)
+	public void preProcessData(Response response)
 	{
+		Logger.i(TAG, "LoginActivity//preProcessData");
+
+		Logger.i(TAG, "Response: " + response);
+		Logger.i(TAG, "Activity ID: " + response.getTargetActivityID());
+		Logger.i(TAG, "Tag: " + response.getTag());
+		Logger.i(TAG, "Data: " + response.getData());
 	}
 
-	public void processInitialData(Response response)
+	public void processData(Response response)
 	{
-	}
+		Logger.i(TAG, "LoginActivity//processData");
 
-	public Object saveMemento()
-	{
-		return null;
-	}
-
-	public void loadMemento(Object savedMemento)
-	{
+		Logger.i(TAG, "Response: " + response);
+		Logger.i(TAG, "Activity ID: " + response.getTargetActivityID());
+		Logger.i(TAG, "Tag: " + response.getTag());
+		Logger.i(TAG, "Data: " + response.getData());
 	}
 
 	protected void showProgress()
@@ -212,7 +210,7 @@ public abstract class BaseActivity extends Activity implements IResponseListener
 		{
 		}
 	}
-	
+
 	@Override
 	protected Dialog onCreateDialog(int id)
 	{
@@ -220,7 +218,7 @@ public abstract class BaseActivity extends Activity implements IResponseListener
 		{
 			case DIALOG_ID_PROGRESS_DEFAULT:
 				ProgressDialog dlg = new ProgressDialog(this);
-				//dlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+				// dlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 				dlg.setMessage("Working...");
 				dlg.setCancelable(true);
 				return dlg;
@@ -232,41 +230,42 @@ public abstract class BaseActivity extends Activity implements IResponseListener
 
 	protected final void go(int commandID, Request request)
 	{
+		Logger.i(TAG, "go with cmdid=" + commandID);
 		go(commandID, request, true);
 	}
 
 	protected final void go(int commandID, Request request, boolean showProgress)
 	{
-		if(showProgress)
-		{
-			showProgress();
-		}
-		getController().go(commandID, request, this);
+		Logger.i(TAG, "go with cmdid=" + commandID + ", request: " + request);
+		go(commandID, request, true, true);
 	}
-	
+
 	protected final void go(int commandID, Request request, boolean showProgress, boolean record)
 	{
+		Logger.i(TAG, "go with cmdid=" + commandID + ", record: " + record + ", request: " + request);
+		go(commandID, request, true, true, false);
+	}
+
+	protected final void go(int commandID, Request request, boolean showProgress, boolean record, boolean resetStack)
+	{
 		if(showProgress)
 		{
 			showProgress();
 		}
+		Logger.i(TAG, "go with cmdid=" + commandID + ", record: " + record + ",rs: " + resetStack + ", request: "
+				+ request);
+		getController().go(commandID, request, this, record, resetStack);
 	}
-	
+
 	protected final void back()
 	{
+		Logger.i(TAG, "Got a message to go back");
 		getController().back();
 	}
+
+	@Override
+	public void onBackPressed()
+	{
+		back();
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
